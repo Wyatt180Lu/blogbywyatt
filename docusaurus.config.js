@@ -54,8 +54,8 @@ const config = {
         include: ['*.md', '*.mdx'], // 支援的文章檔案格式
         blogTitle: 'My Blog',
         blogDescription: 'Blog powered by Docusaurus',
-        postsPerPage: 20,
-        blogSidebarCount: 10,
+        postsPerPage: 365,
+        blogSidebarCount: 365,
         blogSidebarTitle: 'Blog列表',
         showReadingTime: true,
         feedOptions: {
