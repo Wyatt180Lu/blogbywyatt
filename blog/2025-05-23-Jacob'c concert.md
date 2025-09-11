@@ -4,7 +4,7 @@
 每個人都是超強的：
 * 演奏家
 * 即興家
-* 歌手
+* 歌手  
 超級無敵精彩  
 底下留下照片合集  
 [Audience Choir影片](https://www.youtube.com/watch?v=K-xNcF5HSlc)
