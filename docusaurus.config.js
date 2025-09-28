@@ -86,7 +86,7 @@ const config = {
         title: "Wyatt's Blog",
         logo: {
           alt: 'My Site Logo',
-          src: 'img/blogphoto.png',
+          src: 'img/blog-resized.jpg',
         },
         items: [
           /*{
