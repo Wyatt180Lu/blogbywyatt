@@ -81,7 +81,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/eahc.jpeg',
+      image: 'img/blog-resized.jpg',
       navbar: {
         title: "Wyatt's Blog",
         logo: {
