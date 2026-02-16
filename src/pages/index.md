@@ -2,7 +2,7 @@
 title: wyatt
 ---
 
-# 呂致均的Blog
+# Wyatt的Blog
 
 這裡是我的個人網站  
 聯絡我 e-mail : wyatt180lu@proton.me  
