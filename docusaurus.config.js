@@ -119,7 +119,7 @@ const config = {
               },
             ],
           },*/
-          {
+          /*{
             title: '社群',
             items: [
               
@@ -137,7 +137,7 @@ const config = {
                 href: 'https://www.instagram.com/wyatt180lu/',
               },
             ],
-          },
+          },*/
           {
             title: '站內連結',
             items: [
@@ -148,6 +148,10 @@ const config = {
               {
                 label: '關於我',
                 href: '/AboutMe',
+              },
+              {
+                label: 'CDs',
+                href: '/CDs',
               },
             ],
           },
