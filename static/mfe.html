@@ -159,8 +159,8 @@
 	<script>
 	const canvas=document.getElementById('c1');
 	const ctx=canvas.getContext('2d');
-	canvas.width=canvas.offsetWidth;
-	canvas.height=canvas.offsetHeight;
+	canvas.width = window.innerWidth;
+	canvas.height = canvas.offsetHeight || 500;
 	
 	const pad={top:40, right:40, bottom:40, left:40};
 	const W=canvas.width;
