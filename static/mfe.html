@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Stress and Strain Diagram</title> 
+	<style>
+		body{
+			font-family:"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif;
+			font-size:18px;
+			color:black;
+			background-color:white;
+			line-height:1.6;
+			margin:0px;
+			font-weight:100;
+		}
+		h1{
+			font-size:48px;
+			margin:18px;
+			color:white;
+		}
+		h2, h3, h4 {
+			margin-left:36px;
+			margin-top:0px;
+			margin-bottom:0px;
+			font-weight:200;
+		}
+		h2{
+			margin-bottom:20px;
+		}
+		p{
+			line-height:1.8;
+			margin-left:36px;
+			margin-top:0px;
+		}
+		img{
+			width:500px;
+			height:auto;
+			/*border:0.8px solid white;*//*邊線*/
+			margin: 18px 18px 18px 36px;;/*跟其他東西的距離*/
+			/*maring:0 auto;圖片放中間*/
+			/*padding:1px;*//*跟跟線的距離*/
+			border-radius:8px;/*圓角*//*這超帥一定要用爆*/
+			opacity:1;/*透明度*/
+			display:block; /* 讓圖片變成區塊，方便置中 */
+			
+		}
+		a{
+			color:#31A095;
+		}
+		header{
+			background-color:#111;
+			/*padding:20px*/
+			color:white;
+			border-radius:0px;
+			display:flex;
+			justify-content: space-between;
+			align-items:center;
+			padding:0 36px;
+			height:100px;
+		}
+		footer {
+		  background-color:#111;
+		  /*text-align: center;*/
+		  height: 200px;
+		  display:flex;
+		  justify-content:center;
+		  align-items:center;
+		}
+		footer p{
+			color:white;
+			font-weight:500;	
+		}
+		nav{
+			display:flex;
+			flex-direction:column;
+			align-items:center;
+		}
+		nav p{
+			margin:0px;
+		}
+		canvas{
+			width:100%;
+		}
+		#controls{
+			margin-left:40px;
+			display:flex;
+			gap:16px;
+		}
+		button{
+			font-size:14px;
+			color:white;
+			padding:4px 10px;
+			border-radius:8px;
+			cursor:pointer;
+			background-color:#0000E3;
+			border: none;
+		}		
+		button:hover{
+			background-color:gray;		
+		}		
+		button.active{
+			background-color:orange;
+		}
+		</style>
+</head>
+
+<body>
+	
+	<header>
+	<h1>Stress and Strain Diagram</h1>
+	<nav>
+	<p>給部落格的展示</p>
+	<p>Wyatt</p>
+	</nav>
+	</header>
+
+	<canvas id="c1" height=500px></canvas>
+
+	<div id="presets" style="margin:20px 40px 10px">
+		<span style="margin-right:0px;">預設材料：</span>
+		<button onclick="setPreset('steel')">低碳鋼</button>
+		<button onclick="setPreset('aluminum')">鋁合金</button>
+		<button onclick="setPreset('titanium')">鈦合金</button>
+		<button onclick="setPreset('cast_iron')">鑄鐵</button>
+	</div>
+
+
+
+	
+	<div id="controls">
+	<label>降伏強度 σy
+	<input type="range" id="sy-slider" min="100" max="600" value="250">
+	<span id="sy-label">250MPa</span>
+	</label>
+
+	<label>極限強度 σu
+	<input type="range" id="su-slider" min="200" max="900" value="400">
+	<span id="su-label">400MPa</span>
+	</label>
+
+	<label>楊氏模數 E
+	<input type="range" id="E-slider" min="50" max="400" value="200">
+	<span id="E-label">200GPa</span>
+	</label>
+
+	<label>斷裂伸長率 εf
+	<input type="range" id="ef-slider" min="1" max="50" value="20">
+	<span id="ef-label">20%</span>
+	</label>
+	</div>
+
+	<footer>
+	<nav>
+		<p>自主學習成果</p>
+		<p>2026/04/22</p>
+	<nav>
+	</footer>
+	<script>
+	const canvas=document.getElementById('c1');
+	const ctx=canvas.getContext('2d');
+	canvas.width=canvas.offsetWidth;
+	canvas.height=canvas.offsetHeight;
+	
+	const pad={top:40, right:40, bottom:40, left:40};
+	const W=canvas.width;
+	const H=canvas.height;
+	const chartW=W-pad.left-pad.right;
+	const chartH=H-pad.top-pad.bottom;
+	
+	ctx.beginPath();
+	ctx.moveTo(pad.left, pad.top+chartH);
+	ctx.lineTo(pad.right+chartW,  pad.top+chartH);
+	ctx.strokeStyle='black';
+	ctx.lineWidth=1;
+	ctx.stroke();
+	
+	ctx.beginPath();
+	ctx.moveTo(pad.left, pad.top);
+	ctx.lineTo(pad.left,  pad.top+chartH);
+	ctx.strokeStyle='black';
+	ctx.lineWidth=1;
+	ctx.stroke();
+	
+	ctx.font='18px "SF Pro", -apple-system, BlinkMacSystemFont ';
+	ctx.fillStyle='black';
+	ctx.fillText('應變 ε ', pad.left+chartW/2, H - 10);
+	
+	
+	const maxStrain=0.3;
+	const maxStress=1200;
+	
+	function toX(strain){
+		return pad.left+(strain/maxStrain)*chartW;
+	}
+	
+	function toY(stress){
+		return pad.top+chartH-(stress/maxStress)*chartH;
+	}
+	
+	const presets = {
+	    steel:     { E: 200, sy: 250, su: 400, ef: 25 },
+	    aluminum:  { E: 70,  sy: 270, su: 310, ef: 12 },
+	    titanium:  { E: 110, sy: 880, su: 950, ef: 14 },
+	    cast_iron: { E: 170, sy: 200, su: 200, ef: 1  },
+	};
+	
+	function setPreset(name) {
+		document.querySelectorAll('#presets button').forEach(btn => {
+	        btn.classList.remove('active');
+	    });
+	    event.target.classList.add('active');
+	
+	    const p = presets[name];
+	    document.getElementById('E-slider').value  = p.E;
+	    document.getElementById('sy-slider').value = p.sy;
+	    document.getElementById('su-slider').value = p.su;
+	    document.getElementById('ef-slider').value = p.ef;
+	    document.getElementById('E-label').textContent  = p.E  + 'GPa';
+	    document.getElementById('sy-label').textContent = p.sy + 'MPa';
+	    document.getElementById('su-label').textContent = p.su + 'MPa';
+	    document.getElementById('ef-label').textContent = p.ef + '%';
+	    draw();
+	}
+	
+	function draw(){
+		const E=parseFloat(document.getElementById('E-slider').value);
+		const sy=parseFloat(document.getElementById('sy-slider').value);
+		const su=parseFloat(document.getElementById('su-slider').value);
+		const ef=parseFloat(document.getElementById('ef-slider').value)/100;
+	
+		ctx.clearRect(0, 0, W, H);
+	
+		ctx.beginPath();
+		ctx.moveTo(pad.left, pad.top+chartH);
+		ctx.lineTo(pad.left+chartW,  pad.top+chartH);
+		ctx.strokeStyle='black';
+		ctx.lineWidth=1;
+		ctx.stroke();
+		
+		ctx.beginPath();
+		ctx.moveTo(pad.left, pad.top);
+		ctx.lineTo(pad.left,  pad.top+chartH);
+		ctx.strokeStyle='black';
+		ctx.lineWidth=1;
+		ctx.stroke();
+	
+		ctx.fillText('應變 ε ', pad.left+chartW/2, H - 10);
+	
+		const ey=sy/(E*1000);
+		const points=[];
+		for (let i=0; i<=20; i++){
+			const strain=(i/20)*ey;
+			const stress=strain*E*1000;
+			points.push([strain,stress]);
+		}
+		for (let i=0; i<=10; i++){
+			const strain =ey+(i/10)*(ey*0.5);
+			const stress =sy;
+			points.push([strain,stress]);
+		}
+		for(let i=0; i<=30; i++){
+			const t=i/30;
+			const strain =ey*1.5+t*(ef*0.8-ey*1.5);
+			const stress=sy+(su-sy)*Math.sin(t*Math.PI/2);
+			points.push([strain, stress]);
+		}
+		for (let i=0; i<=20; i++){
+			const t=i/20;
+			const strain =ef*0.8+t*(ef-ef*0.8);
+			const stress=su-(su-sy*0.6)*t;
+			points.push([strain,stress]);
+		}
+		ctx.beginPath();
+		for(let i=0; i<points.length; i++){
+			const x=toX(points[i][0]);
+			const y=toY(points[i][1]);
+			if (i===0)ctx.moveTo(x, y);
+			else ctx.lineTo(x, y);
+		}
+		ctx.strokeStyle ='steelblue';
+		ctx.lineWidth=2;
+		ctx.stroke();
+		
+	}
+	document.getElementById('sy-slider').addEventListener('input', function(){
+		document.getElementById('sy-label').textContent=this.value+'MPa';
+		draw();
+	})
+	document.getElementById('su-slider').addEventListener('input', function(){
+		document.getElementById('su-label').textContent=this.value+'MPa';
+		draw();
+	})
+	document.getElementById('E-slider').addEventListener('input', function(){
+		document.getElementById('E-label').textContent=this.value+'GPa';
+		draw();
+	})
+	document.getElementById('ef-slider').addEventListener('input', function(){
+		document.getElementById('ef-label').textContent=this.value+'%';
+		draw();
+	})
+	draw();
+	
+	
+	
+	
+	
+	
+	</script>
+
+
+	</body>
+
+	
+
+</html>
